@@ -1,9 +1,13 @@
 var express = require("express");
-var expressHandlebars = require("express-handlebars");
+var expressHandleBars = require("express-handlebars");
 var mongoose = require("mongoose");
 var bodyParser = require("body-parser");
 var cheerio = require("cheerio");
 var request = require("request");
+var logger = require("morgan");
+var axios = require("axios");
+
+// var routes = require("./controllers/controllers.js")
 
 var db = require("./models");
 var PORT = process.env.PORT || 3000;
@@ -13,10 +17,16 @@ app.use(logger("dev"));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static("public"));
 
+app.engine("handlebars", expressHandleBars({defaultLayout: "main"}));
+app.set("view engine", "handlebars");
+
 mongoose.Promise = Promise;
+var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongo-scraper" ;
 mongoose.connect("mongodb://localhost/mongoScraperHW", {
   useMongoClient: true
 });
+
+/////////////
 
 app.get("/scrape", function(req, res) {
 
@@ -46,25 +56,66 @@ app.get("/scrape", function(req, res) {
 });
 
 app.get("/articles", function(req, res) {
-
+,
   db.Article
     .find({})
     .then(function(dbArticle) {
-      res.json(dbArticle);
+        var hbsObject = {
+          myKey: "Hello my name is Earl",
+          allArticles: dbArticle
+        };
+
+  res.render("index", hbsObject);
+
   })
     .catch(function(err) {
       res.json(err);
   });
 
-});
-
-app.get("/articles/:id", function(req, res) {
 
 });
 
-// app.post("/articles/:id", function(req, res) {
+// app.get("/articles/:id", function(req, res) {
+
+//   var id = req.params.id ;
+
+//     db.Article
+//     .find({_id: id})
+//     .then(function(dbArticle) {
+//       res.json(dbArticle);
+//   })
+//     .catch(function(err) {
+//       res.json(err);
+//   });
 
 // });
+
+// app.get("/articles/saved", function(req, res) {
+
+//   db.Article
+//     .find({saved: true})
+//     .then(function(dbArticles) {
+//       console.log(dbArticles);
+
+//       if (dbArticles.length = 0) {
+//         var article = {
+//           article: dbArticles
+//         }
+//         res.
+//       } else {
+
+//       }
+//     }
+
+//     }
+
+
+
+
+
+
+
+//  });
 
 app.listen(PORT, function() {
   console.log("App running on port " + PORT + "!");
