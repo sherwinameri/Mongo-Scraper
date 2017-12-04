@@ -28,7 +28,8 @@ mongoose.connect("mongodb://localhost/mongoScraperHW", {
 
 /////////////
 
-app.get("/scrape", function(req, res) {
+// scrapes upon running the server (root)
+app.get("/", function(req, res) {
 
   axios.get("http://www.echojs.com/").then(function(response) {
     var $ = cheerio.load(response.data);
@@ -46,7 +47,7 @@ app.get("/scrape", function(req, res) {
       db.Article
         .create(result)
         .then(function(dbArticle) {
-          res.send("Scrape Complete!!!");
+          res.send("Scrape Complete!!! (go to the '/articles' route now!)");
         })
         .catch(function(err) {
           res.json(err);
@@ -55,8 +56,9 @@ app.get("/scrape", function(req, res) {
   });
 });
 
+// show articles
 app.get("/articles", function(req, res) {
-,
+
   db.Article
     .find({})
     .then(function(dbArticle) {
